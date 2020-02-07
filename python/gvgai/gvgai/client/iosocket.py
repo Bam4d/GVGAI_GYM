@@ -8,6 +8,7 @@ from struct import pack_into, unpack_from
 class IOSocket:
 
     def __init__(self, client_only=False):
+        if 
         self.HEADER_SIZE = 13
         self.BUFFER_SIZE = 8192*10
         self.hostname, self.port = self.getOpenAddress()
@@ -27,7 +28,9 @@ class IOSocket:
             try:
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+                if not 'darwin' in sys.platform():
+                    self._logger.warn('Attempting to run without TCP_QUICKACK. Consider running instead on unix.')
+                    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
                 self.socket.connect((self.hostname, self.port))
                 self.connected = True
                 self._logger.debug("Client connected to server [OK]")
