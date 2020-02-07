@@ -27,7 +27,7 @@ class IOSocket:
             try:
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                if not 'darwin' in sys.platform():
+                if not 'darwin' in sys.platform:
                     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
                 else:
                     self._logger.warn('Attempting to run without TCP_QUICKACK. Consider running instead on unix!')
