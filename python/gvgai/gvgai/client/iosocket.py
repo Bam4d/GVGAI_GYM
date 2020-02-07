@@ -8,7 +8,6 @@ from struct import pack_into, unpack_from
 class IOSocket:
 
     def __init__(self, client_only=False):
-        if 
         self.HEADER_SIZE = 13
         self.BUFFER_SIZE = 8192*10
         self.hostname, self.port = self.getOpenAddress()
