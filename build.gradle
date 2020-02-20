@@ -11,6 +11,12 @@ subprojects {
         mavenCentral()
     }
 
+    jar {
+        manifest {
+            attributes 'Main-Class': 'qmul.gvgai.server.Application'
+        }
+    }
+
     dependencies {
 
         // logging modules
