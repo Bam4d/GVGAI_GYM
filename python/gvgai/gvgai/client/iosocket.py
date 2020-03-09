@@ -28,13 +28,14 @@ class IOSocket:
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                 if not 'darwin' in sys.platform:
-                    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+                    self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
                 else:
                     self._logger.warn('Attempting to run without TCP_QUICKACK. Consider running instead on unix!')
                 self.socket.connect((self.hostname, self.port))
                 self.connected = True
                 self._logger.debug("Client connected to server [OK]")
             except Exception as e:
+                self._logger.error("Could not connect, trying again")
                 time.sleep(1)
 
     def writeToServer(self, agent_phase, data=None):
