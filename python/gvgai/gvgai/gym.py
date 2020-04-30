@@ -158,12 +158,11 @@ class GVGAI_Env(gym.Env):
 
     def stop(self):
         self.close()
-        self.GVGAI.stop()
+        if hasattr(self, 'GVGAI'):
+            self.GVGAI.stop()
 
     def __del__(self):
-        self.close()
-        self.GVGAI.stop()
-
+        self.stop()
 
 class SimpleImageViewer(object):
 

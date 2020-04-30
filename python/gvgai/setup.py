@@ -1,10 +1,12 @@
-from setuptools import setup, find_packages
-import os
 import logging
-import sys
+import os
 import subprocess
+import sys
+from sys import platform
 
-from gvgai.client.utils.logpipe import LogPipe
+from setuptools import setup, find_packages
+
+from util.logpipe import LogPipe
 
 with open("../../README.md", "r") as fh:
     long_description = fh.read()
@@ -27,7 +29,11 @@ def gradle_install():
     logger.debug(f'{root_path}')
     logger.info(f'Building GVGAI Environment')
 
-    cmd = [f'{root_path}/gradlew', 'clean', 'install']
+    if platform == "linux" or platform == "linux2" or platform == "darwin":
+        cmd = [f'{root_path}/gradlew', 'clean', 'install']
+    elif platform == "win32":
+        cmd = [f'{root_path}/gradlew.bat', 'clean', 'install']
+
     try:
         # Pump the logging output to a logger so we can see it
         subprocess.call(cmd, stdout=logpipe, stderr=logpipe, cwd=root_path)
@@ -55,7 +61,7 @@ class GradleInstallCommand(install):
 
 setup(
     name='gvgai-gym',
-    version="0.2.1",
+    version="0.3.1",
     author_email="chrisbam4d@gmail.com",
     description="GVGAI Gym Python",
     long_description=long_description,

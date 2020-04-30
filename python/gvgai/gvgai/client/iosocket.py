@@ -1,15 +1,17 @@
 import logging
 import socket
 import sys
-import traceback
 import time
+import traceback
 from struct import pack_into, unpack_from
+from sys import platform
+
 
 class IOSocket:
 
     def __init__(self, client_only=False):
         self.HEADER_SIZE = 13
-        self.BUFFER_SIZE = 8192*10
+        self.BUFFER_SIZE = 8192 * 10
         self.hostname, self.port = self.getOpenAddress()
         self.connected = False
         self.socket = None
@@ -23,20 +25,25 @@ class IOSocket:
 
     def initBuffers(self):
         self._logger.debug(f'Connecting to host {self.hostname} at port {self.port}')
+        connection_attempts = 0
         while not self.connected:
             try:
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                if not 'darwin' in sys.platform:
+                if platform == 'linux' or platform == 'linux2':
                     self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
-                else:
-                    self._logger.warn('Attempting to run without TCP_QUICKACK. Consider running instead on unix!')
+
                 self.socket.connect((self.hostname, self.port))
                 self.connected = True
                 self._logger.debug("Client connected to server [OK]")
             except Exception as e:
-                self._logger.error("Could not connect, trying again")
+                connection_attempts += 1
+                self._logger.warning(e)
+                self._logger.info(f'Could not connect, will try again. (Attempt {connection_attempts})')
                 time.sleep(1)
+                if connection_attempts == 3:
+                    self._logger.error('Cannot connect to GVGAI', e)
+                    sys.exit(-1)
 
     def writeToServer(self, agent_phase, data=None):
 
@@ -71,7 +78,7 @@ class IOSocket:
 
     def getOpenAddress(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(("localhost",0))
+        s.bind(("localhost", 0))
         address = s.getsockname()
         s.close()
         return address
@@ -79,11 +86,10 @@ class IOSocket:
     def _read_until(self, length):
         buffer = bytearray()
         while len(buffer) < length:
-            recv_size = min(length-len(buffer), self.BUFFER_SIZE)
+            recv_size = min(length - len(buffer), self.BUFFER_SIZE)
             buffer += bytearray(self.socket.recv(recv_size))
         return buffer
 
-    
     def readFromServer(self):
         # Firstly read the header bytes
         header_buffer = self._read_until(self.HEADER_SIZE)
@@ -92,4 +98,3 @@ class IOSocket:
         if message_size > 0:
             data = self._read_until(message_size)
         return game_phase, data
-
