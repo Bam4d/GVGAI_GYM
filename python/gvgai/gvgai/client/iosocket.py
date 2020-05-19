@@ -38,8 +38,7 @@ class IOSocket:
                 self._logger.debug("Client connected to server [OK]")
             except Exception as e:
                 connection_attempts += 1
-                self._logger.warning(e)
-                self._logger.info(f'Could not connect, will try again. (Attempt {connection_attempts})')
+                self._logger.debug(f'Waiting to Connect to GVGAI. (Attempt {connection_attempts})')
                 time.sleep(1)
                 if connection_attempts == 3:
                     self._logger.error('Cannot connect to GVGAI', e)
