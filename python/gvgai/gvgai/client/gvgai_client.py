@@ -50,7 +50,7 @@ class GVGAIClient():
             elif platform == "win32":
                 script_cmd = f'{script_location}/server.bat'
 
-            cmd = [script_cmd, '-i', f'{root_path}/games', '-p', f'{self.io.port}', '-l', '{logging.getLevelName(java_log_level)}']
+            cmd = [script_cmd, '-i', f'{root_path}/games', '-p', f'{self.io.port}', '-l', f'{logging.getLevelName(java_log_level)}']
 
             try:
                 # Pump the logging output to a logger so we can see it
